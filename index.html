@@ -14,7 +14,7 @@
    EDIT EVERYTHING HERE — the page fills itself from this.
    ========================================================= */
 const CONFIG = {
-  partner1:      "Seba",
+  partner1:      "Séba",
   partner1Last:  "Shaarawy",
   partner2:      "Ahmed",
   partner2Last:  "Soliman",
@@ -384,12 +384,15 @@ textarea{min-height:90px; resize:vertical}
 
   /* ---- Intro + music ---- */
   const intro = $("intro"), audio = $("bgm"), mBtn = $("musicBtn");
-  if (C.music) { audio.src = C.music; mBtn.classList.remove("hidden"); }
+  if (C.music) { audio.src = C.music; audio.volume = 0.35; audio.preload = "auto"; mBtn.classList.remove("hidden"); }
 
   function playMusic(){
     if (!C.music) return;
-    audio.play().then(() => { mBtn.classList.add("playing"); mBtn.classList.remove("muted"); }).catch(()=>{});
+    audio.play().then(() => { mBtn.classList.add("playing"); mBtn.classList.remove("muted"); }).catch(() => { mBtn.classList.remove("playing"); mBtn.classList.add("muted"); });
   }
+  // Try autoplay on page load. If the browser blocks audible autoplay,
+  // the guest's first tap on the invitation envelope starts the music.
+  if (C.music) playMusic();
   function openInvite(){
     if (intro.classList.contains("opened")) return;
     intro.classList.add("opened");
