@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seba &amp; Ahmed — Wedding</title>
+<meta name="description" content="You're invited to our wedding">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script>
+/* =========================================================
+   EDIT EVERYTHING HERE — the page fills itself from this.
+   ========================================================= */
+const CONFIG = {
+  partner1:      "Séba",
+  partner1Last:  "Shaarawy",
+  partner2:      "Ahmed",
+  partner2Last:  "Soliman",
+  initials:      "S&A",                       // shown on the wax seal
+
+  // Local date & time of the first event (YYYY-MM-DDTHH:MM:SS)
+  date:          "2026-12-19T13:00:00",
+  dateLine:      "19 · DEC · 2026 · Cairo",   // short line on the intro
+  weekday:       "Saturday",
+  dayMonth:      "19th of December",
+  year:          "2026",
+
+  intro:         "Together with their families,",
+  inviteLine:    "joyfully invite you to celebrate their Katb El Kitab!",
+
+  // Add more events by copying a { ... } line (e.g. a reception)
+  events: [
+    { title: "Katb El Kitab", time: "1:00 PM", place: "Al-Fattah Al-Aleem Mosque", area: "New Administrative Capital",
+      map: "https://maps.google.com/?q=Al+Fattah+Al+Aleem+Mosque+New+Administrative+Capital" }
+  ],
+
+  quote:         "And He placed between you affection and mercy.",
+  quoteSource:   "Ar-Rum 30:21",             // leave "" to hide the quote source
+  signOff:       "With all our love,",
+
+  rsvpDeadline:  "5th of December, 2026",
+  maxGuests:     2,                          // Alone or +1
+
+  // Google Apps Script Web App URL for saving RSVP responses.
+  rsvpEndpoint:  "https://script.google.com/macros/s/AKfycbzNYybbHiZ_AdySVkYDSXRTQHO-1G6hh-jVuy1nK5qxDhqovBOiJGWTE8tKr_wptqowTA/exec",
+
+  // Put a music.mp3 next to this file, or "" to hide the music button.
+  music:         "music.mp3"
+};
+</script>
+
+<style>
+:root{
+  --ivory:#f8f4ec; --paper:#fffdf8; --ink:#2e3530; --muted:#6c736c;
+  --sage:#7f9178; --sage-dark:#5d6e58; --gold:#b38f57; --gold-soft:#d9c29a;
+  --seal:#8a2f2f; --seal-dark:#5f1e1e; --line:rgba(179,143,87,.35);
+  --serif:"Cormorant Garamond", Georgia, serif;
+  --script:"Pinyon Script", cursive;
+  --sans:"Montserrat", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ivory); color:var(--ink); font-family:var(--serif);
+  font-size:19px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body.locked{overflow:hidden}
+a{color:inherit}
+
+/* ---------- Intro / envelope ---------- */
+#intro{
+  position:fixed; inset:0; z-index:50; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:34px; padding:24px;
+  background:radial-gradient(ellipse at center, #fbf8f2 0%, #ece4d6 100%);
+  transition:opacity 1s ease, visibility 1s ease; cursor:pointer;
+}
+#intro.gone{opacity:0; visibility:hidden}
+.env{position:relative; width:min(80vw,330px); aspect-ratio:3/2; perspective:1200px}
+.env-back{position:absolute; inset:0; background:#e3d8c5; border-radius:6px;
+  box-shadow:0 18px 40px rgba(60,45,25,.18)}
+.env-card{position:absolute; left:6%; right:6%; top:7%; bottom:7%; z-index:1;
+  background:var(--paper); border-radius:3px; display:flex; align-items:center;
+  justify-content:center; font-family:var(--script); font-size:30px; color:var(--sage-dark);
+  transition:transform 1s cubic-bezier(.2,.8,.2,1) .55s}
+.env-front{position:absolute; inset:0; z-index:2; background:#eee5d5; border-radius:6px;
+  clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%)}
+.env-flap{position:absolute; top:0; left:0; right:0; height:62%; z-index:3;
+  background:#e6dbc8; clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top center; transition:transform .8s ease, z-index 0s .4s}
+.seal{position:absolute; left:50%; top:60%; z-index:4; width:68px; height:68px;
+  transform:translate(-50%,-50%); border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #a94545, var(--seal) 55%, var(--seal-dark));
+  box-shadow:0 3px 8px rgba(0,0,0,.25), inset 0 0 0 4px rgba(255,255,255,.08);
+  color:#f2dfbf; font-family:var(--script); font-size:24px;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity .4s ease, transform .4s ease}
+#intro.opened .seal{opacity:0; transform:translate(-50%,-50%) scale(.6)}
+#intro.opened .env-flap{transform:rotateX(180deg); z-index:0}
+#intro.opened .env-card{transform:translateY(-42%)}
+.intro-date{font-family:var(--sans); font-size:12px; letter-spacing:.32em; color:var(--muted); text-align:center}
+.tap{font-family:var(--sans); font-size:11px; letter-spacing:.4em; text-transform:uppercase;
+  color:var(--gold); animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* ---------- Layout ---------- */
+main{max-width:620px; margin:0 auto; padding:0 16px}
+section{padding:64px 0; text-align:center}
+.divider{display:flex; align-items:center; gap:14px; justify-content:center; color:var(--gold); margin:26px auto}
+.divider::before,.divider::after{content:""; height:1px; width:70px; background:var(--line)}
+.eyebrow{font-family:var(--sans); font-size:11px; letter-spacing:.38em; text-transform:uppercase; color:var(--gold)}
+
+/* Hero */
+.hero{min-height:100svh; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative}
+.hero::before{content:""; position:absolute; inset:18px; border:1px solid var(--line); border-radius:4px; pointer-events:none}
+.hero::after{content:""; position:absolute; inset:26px; border:1px solid var(--line); border-radius:2px; pointer-events:none}
+.hero .lead{font-style:italic; color:var(--muted); font-size:20px}
+.name{font-family:var(--script); font-size:clamp(56px,16vw,92px); line-height:1.05; color:var(--sage-dark); margin-top:14px}
+.surname{font-family:var(--sans); font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:var(--muted); margin-top:2px}
+.amp{font-family:var(--script); font-size:44px; color:var(--gold); margin:10px 0 0}
+.invite{margin-top:26px; font-size:21px; max-width:20ch}
+
+/* Date block */
+.date-block{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; max-width:420px; margin:0 auto}
+.date-block .side{font-family:var(--sans); font-size:12px; letter-spacing:.28em; text-transform:uppercase;
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:10px 0}
+.date-block .day{font-size:28px; font-weight:500; line-height:1.2}
+.year{font-family:var(--sans); letter-spacing:.4em; font-size:13px; margin-top:12px; color:var(--muted)}
+
+/* Countdown */
+.countdown{display:flex; justify-content:center; gap:10px; margin-top:22px}
+.cd{width:72px; padding:12px 0; background:var(--paper); border:1px solid var(--line); border-radius:4px}
+.cd b{display:block; font-size:30px; font-weight:500; line-height:1.1}
+.cd span{font-family:var(--sans); font-size:9px; letter-spacing:.25em; text-transform:uppercase; color:var(--muted)}
+.cd-done{font-family:var(--script); font-size:40px; color:var(--sage-dark); margin-top:18px}
+
+/* Events */
+.events{display:grid; gap:18px; margin-top:28px}
+.event{background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:30px 20px}
+.event h3{font-family:var(--script); font-weight:400; font-size:40px; color:var(--sage-dark); line-height:1}
+.event .time{font-family:var(--sans); font-size:13px; letter-spacing:.3em; color:var(--gold); margin:12px 0 6px}
+.event .place{font-size:22px; font-weight:500}
+.event .area{color:var(--muted); font-style:italic}
+.btn{display:inline-block; font-family:var(--sans); font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+  text-decoration:none; border:1px solid var(--gold); color:var(--ink); padding:12px 22px; border-radius:40px;
+  background:transparent; cursor:pointer; transition:background .25s, color .25s; margin-top:16px}
+.btn:hover{background:var(--gold); color:#fff}
+.btn.solid{background:var(--sage-dark); border-color:var(--sage-dark); color:#fff; padding:15px 32px}
+.btn.solid:hover{background:var(--ink); border-color:var(--ink)}
+
+/* Quote + footer */
+blockquote{font-style:italic; font-size:24px; max-width:24ch; margin:0 auto; line-height:1.45}
+cite{display:block; margin-top:12px; font-family:var(--sans); font-style:normal; font-size:11px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase}
+.signoff{font-style:italic; color:var(--muted)}
+.sign-names{font-family:var(--script); font-size:46px; color:var(--sage-dark)}
+footer{padding:20px 0 70px; text-align:center; font-family:var(--sans); font-size:10px; letter-spacing:.3em; color:var(--muted)}
+
+/* Scroll reveal */
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s ease}
+.reveal.in{opacity:1; transform:none}
+
+/* Music button */
+#musicBtn{position:fixed; right:16px; bottom:16px; z-index:40; width:46px; height:46px; border-radius:50%;
+  border:1px solid var(--gold); background:rgba(255,253,248,.9); color:var(--gold); font-size:20px; cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.08)}
+#musicBtn.playing{animation:spin 6s linear infinite}
+#musicBtn.muted{opacity:.55; text-decoration:line-through}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- RSVP modal ---------- */
+#rsvp{position:fixed; inset:0; z-index:60; background:rgba(40,40,35,.55); display:flex; align-items:flex-end;
+  justify-content:center; opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s}
+#rsvp.open{opacity:1; visibility:visible}
+.sheet{background:var(--paper); width:100%; max-width:520px; max-height:92svh; overflow-y:auto;
+  border-radius:16px 16px 0 0; padding:34px 22px 28px; position:relative;
+  transform:translateY(40px); transition:transform .35s ease}
+#rsvp.open .sheet{transform:none}
+@media(min-width:600px){ #rsvp{align-items:center} .sheet{border-radius:12px} }
+.close{position:absolute; top:12px; right:14px; border:0; background:none; font-size:22px; color:var(--muted); cursor:pointer; padding:6px}
+.sheet h2{text-align:center; font-weight:500; letter-spacing:.5em; font-size:26px}
+.sheet .deadline{text-align:center; font-style:italic; color:var(--muted); margin-bottom:22px}
+.field{margin-bottom:18px}
+.field > label, .field legend{display:block; font-family:var(--sans); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px}
+fieldset{border:0}
+input[type=text], select, textarea{width:100%; font:inherit; font-size:18px; color:var(--ink); background:var(--ivory);
+  border:1px solid var(--line); border-radius:6px; padding:11px 12px; outline:none}
+input[type=text]:focus, select:focus, textarea:focus{border-color:var(--gold)}
+textarea{min-height:90px; resize:vertical}
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.choices input{position:absolute; opacity:0; pointer-events:none}
+.choices label{display:block; text-align:center; padding:11px 8px; border:1px solid var(--line); border-radius:6px;
+  cursor:pointer; font-size:17px; transition:.2s; background:var(--ivory)}
+.choices input:checked + label{background:var(--sage-dark); color:#fff; border-color:var(--sage-dark)}
+.choices input:focus-visible + label{outline:2px solid var(--gold)}
+.hidden{display:none}
+.submit{width:100%; margin-top:6px}
+.error{color:var(--seal); text-align:center; font-size:16px; margin-top:10px; min-height:1em}
+.thanks{text-align:center; padding:30px 0 10px}
+.thanks h3{font-family:var(--script); font-weight:400; font-size:50px; color:var(--sage-dark)}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important; transition:none!important}
+  .reveal{opacity:1; transform:none}
+}
+</style>
+</head>
+<body class="locked">
+
+<!-- Intro envelope -->
+<div id="intro" role="button" tabindex="0" aria-label="Open the invitation">
+  <div class="env" aria-hidden="true">
+    <div class="env-back"></div>
+    <div class="env-card" id="cardNames"></div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+    <div class="seal" id="sealText"></div>
+  </div>
+  <div class="intro-date" id="introDate"></div>
+  <div class="tap">Tap to open</div>
+</div>
+
+<main>
+  <!-- Hero -->
+  <section class="hero">
+    <p class="lead reveal" id="introLine"></p>
+    <div class="reveal">
+      <div class="name" id="p1"></div>
+      <div class="surname" id="p1Last"></div>
+      <div class="amp">&amp;</div>
+      <div class="name" id="p2" style="margin-top:0"></div>
+      <div class="surname" id="p2Last"></div>
+    </div>
+    <p class="invite reveal" id="inviteLine"></p>
+  </section>
+
+  <!-- Date + countdown -->
+  <section>
+    <div class="eyebrow reveal">Save the date</div>
+    <div class="divider reveal">✦</div>
+    <div class="date-block reveal">
+      <div class="side" id="weekday"></div>
+      <div class="day" id="dayMonth"></div>
+      <div class="side">Cairo</div>
+    </div>
+    <div class="year reveal" id="year"></div>
+    <div class="reveal" id="countdownWrap">
+      <div class="countdown" id="countdown">
+        <div class="cd"><b id="cdD">0</b><span>Days</span></div>
+        <div class="cd"><b id="cdH">0</b><span>Hours</span></div>
+        <div class="cd"><b id="cdM">0</b><span>Mins</span></div>
+        <div class="cd"><b id="cdS">0</b><span>Secs</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section>
+    <div class="eyebrow reveal">The celebration</div>
+    <div class="divider reveal">✦</div>
+    <div class="events" id="events"></div>
+  </section>
+
+  <!-- RSVP call -->
+  <section>
+    <p class="reveal" style="font-size:24px; font-style:italic">Your presence would mean the world to us</p>
+    <button class="btn solid reveal" id="openRsvp">Kindly RSVP</button>
+  </section>
+
+  <!-- Quote -->
+  <section>
+    <div class="divider reveal">❦</div>
+    <blockquote class="reveal"><span id="quote"></span><cite id="quoteSrc"></cite></blockquote>
+  </section>
+
+  <section style="padding-top:20px">
+    <p class="signoff reveal" id="signoff"></p>
+    <div class="sign-names reveal" id="signNames"></div>
+  </section>
+</main>
+<footer id="footer"></footer>
+
+<button id="musicBtn" class="hidden" aria-label="Toggle music">♪</button>
+<audio id="bgm" loop preload="none"></audio>
+
+<!-- RSVP modal -->
+<div id="rsvp" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
+    <button class="close" id="closeRsvp" aria-label="Close">✕</button>
+
+    <form id="rsvpForm" novalidate>
+      <h2 id="rsvpTitle">RSVP</h2>
+      <p class="deadline" id="deadline"></p>
+
+      <div class="field">
+        <label for="name">Full name *</label>
+        <input type="text" id="name" name="name" autocomplete="name" required>
+      </div>
+
+      <fieldset class="field">
+        <legend>Will you be attending? *</legend>
+        <div class="choices">
+          <input type="radio" id="yes" name="attending" value="Joyfully accepts" required>
+          <label for="yes">Joyfully accepts</label>
+          <input type="radio" id="no" name="attending" value="Regretfully declines">
+          <label for="no">Regretfully declines</label>
+        </div>
+      </fieldset>
+
+      <div id="attendingFields" class="hidden">
+        <div class="field">
+          <label for="guests">Number of guests</label>
+          <select id="guests" name="guests"></select>
+        </div>
+        <div class="field">
+          <label for="eventsAttending">Which events will you attend?</label>
+          <select id="eventsAttending" name="events"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="message">A message for the couple 💌</label>
+        <textarea id="message" name="message"></textarea>
+      </div>
+
+      <button type="submit" class="btn solid submit" id="submitBtn">Send my response</button>
+      <p class="error" id="formError" role="alert"></p>
+    </form>
+
+    <div class="thanks hidden" id="thanks">
+      <h3>Thank you</h3>
+      <p>Your response has been received.</p>
+      <button class="btn" id="doneBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const C = CONFIG, $ = id => document.getElementById(id);
+
+  /* ---- Fill content ---- */
+  document.title = `${C.partner1} & ${C.partner2} — Wedding`;
+  $("sealText").textContent  = C.initials;
+  $("cardNames").textContent = `${C.partner1} & ${C.partner2}`;
+  $("introDate").textContent = C.dateLine;
+  $("introLine").textContent = C.intro;
+  $("p1").textContent = C.partner1;  $("p1Last").textContent = C.partner1Last;
+  $("p2").textContent = C.partner2;  $("p2Last").textContent = C.partner2Last;
+  $("inviteLine").textContent = C.inviteLine;
+  $("weekday").textContent  = C.weekday;
+  $("dayMonth").textContent = C.dayMonth;
+  $("year").textContent     = C.year;
+  $("quote").textContent    = `“${C.quote}”`;
+  $("quoteSrc").textContent = C.quoteSource;
+  $("signoff").textContent  = C.signOff;
+  $("signNames").textContent = `${C.partner1} & ${C.partner2}`;
+  $("deadline").textContent = `Kindly reply by ${C.rsvpDeadline}`;
+  $("footer").textContent   = `${C.partner1.toUpperCase()} & ${C.partner2.toUpperCase()} · ${C.year}`;
+
+  const ev = $("events");
+  C.events.forEach(e => {
+    const card = document.createElement("div");
+    card.className = "event reveal";
+    card.innerHTML = `<h3></h3><div class="time"></div><div class="place"></div><div class="area"></div>
+      <a class="btn" target="_blank" rel="noopener">📍 View location</a>`;
+    card.querySelector("h3").textContent = e.title;
+    card.querySelector(".time").textContent = e.time;
+    card.querySelector(".place").textContent = e.place;
+    card.querySelector(".area").textContent = e.area;
+    card.querySelector("a").href = e.map;
+    ev.appendChild(card);
+  });
+
+  // Guest + event dropdowns
+  $("guests").add(new Option("Alone", "1"));
+  $("guests").add(new Option("+1", "2"));
+  const evSel = $("eventsAttending");
+  if (C.events.length > 1) evSel.add(new Option("All events", "All"));
+  C.events.forEach(e => evSel.add(new Option(`${e.title} only`, e.title)));
+
+  /* ---- Intro + music ---- */
+  const intro = $("intro"), audio = $("bgm"), mBtn = $("musicBtn");
+  if (C.music) { audio.src = C.music; audio.volume = 0.35; mBtn.classList.remove("hidden"); }
+
+  function playMusic(){
+    if (!C.music) return;
+    audio.play().then(() => { mBtn.classList.add("playing"); mBtn.classList.remove("muted"); }).catch(() => { mBtn.classList.remove("playing"); mBtn.classList.add("muted"); });
+  }
+  function openInvite(){
+    if (intro.classList.contains("opened")) return;
+    intro.classList.add("opened");
+    playMusic();
+    setTimeout(() => { intro.classList.add("gone"); document.body.classList.remove("locked"); }, 1700);
+  }
+  intro.addEventListener("click", openInvite);
+  intro.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openInvite(); } });
+  mBtn.addEventListener("click", () => {
+    if (audio.paused) playMusic();
+    else { audio.pause(); mBtn.classList.remove("playing"); mBtn.classList.add("muted"); }
+  });
+
+  /* ---- Scroll reveal ---- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  /* ---- Countdown ---- */
+  const target = new Date(C.date).getTime();
+  function tick(){
+    const diff = target - Date.now();
+    if (isNaN(target) || diff <= 0) {
+      $("countdownWrap").innerHTML = `<div class="cd-done">The big day is here</div>`;
+      return clearInterval(timer);
+    }
+    $("cdD").textContent = Math.floor(diff / 864e5);
+    $("cdH").textContent = Math.floor(diff / 36e5) % 24;
+    $("cdM").textContent = Math.floor(diff / 6e4) % 60;
+    $("cdS").textContent = Math.floor(diff / 1e3) % 60;
+  }
+  const timer = setInterval(tick, 1000); tick();
+
+  /* ---- RSVP modal ---- */
+  const modal = $("rsvp"), form = $("rsvpForm"), thanks = $("thanks");
+  function openModal(){ modal.classList.add("open"); modal.setAttribute("aria-hidden","false"); document.body.classList.add("locked"); setTimeout(()=>$("name").focus(), 300); }
+  function closeModal(){ modal.classList.remove("open"); modal.setAttribute("aria-hidden","true"); document.body.classList.remove("locked"); }
+  $("openRsvp").addEventListener("click", openModal);
+  $("closeRsvp").addEventListener("click", closeModal);
+  $("doneBtn").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("open")) closeModal(); });
+
+  // Show guest/event questions only for "accepts"
+  form.querySelectorAll('input[name="attending"]').forEach(r =>
+    r.addEventListener("change", () => $("attendingFields").classList.toggle("hidden", !$("yes").checked)));
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const err = $("formError"); err.textContent = "";
+    if (!$("name").value.trim()) { err.textContent = "Please enter your name."; return $("name").focus(); }
+    if (!form.attending.value)  { err.textContent = "Please let us know if you can attend."; return; }
+
+    const formData = new FormData(form);
+    const data = {
+      name: (formData.get("name") || "").toString(),
+      attendance: (formData.get("attending") || "").toString(),
+      guests: $("yes").checked ? (formData.get("guests") || "1").toString() : "0",
+      event: $("yes").checked ? (formData.get("events") || "—").toString() : "—",
+      message: (formData.get("message") || "").toString()
+    };
+
+    const btn = $("submitBtn"); btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      // Send JSON as a simple text/plain request so Apps Script can parse e.postData.contents in no-cors mode.
+      await fetch(C.rsvpEndpoint, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
+      form.classList.add("hidden"); thanks.classList.remove("hidden");
+    } catch (_) {
+      err.textContent = "Something went wrong — please check your connection and try again.";
+    } finally {
+      btn.disabled = false; btn.textContent = "Send my response";
+    }
+  });
+})();
+</script>
+</body>
+</html>
